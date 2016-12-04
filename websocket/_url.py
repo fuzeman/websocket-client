@@ -101,12 +101,18 @@ def _is_address_in_network(ip, net):
 
 
 def _is_no_proxy_host(hostname, no_proxy):
+    # Retrieve "no_proxy" variable from environment
     if not no_proxy:
-        v = os.environ.get("no_proxy", "").replace(" ", "")
-        no_proxy = v.split(",")
+        value = os.environ.get("no_proxy", "").replace(" ", "")
+
+        # Split environment variable into hostname values (and ignore empty values)
+        no_proxy = [v for v in value.split(",") if v]
+
+    # Use default value (if none provided)
     if not no_proxy:
         no_proxy = DEFAULT_NO_PROXY_HOST
 
+    # Check if `hostname` should ignore the proxy
     if hostname in no_proxy:
         return True
     elif _is_ip_address(hostname):
