@@ -43,7 +43,9 @@ Default squid setting is "ALLOWED TO CONNECT ONLY HTTPS PORT".
 Current implementation of websocket-client is using "CONNECT" method via proxy.
 
 
-example::
+example
+
+.. code:: python
 
     import websocket
     ws = websocket.WebSocket()
@@ -52,31 +54,14 @@ example::
 
 
 
-Example
-=============
+Examples
+========
 
-Low Level API example::
+Long-lived connection
+---------------------
+This example is similar to how WebSocket code looks in browsers using JavaScript.
 
-    from websocket import create_connection
-    ws = create_connection("ws://echo.websocket.org/")
-    print "Sending 'Hello, World'..."
-    ws.send("Hello, World")
-    print "Sent"
-    print "Receiving..."
-    result =  ws.recv()
-    print "Received '%s'" % result
-    ws.close()
-
-If you want to customize socket options, set sockopt.
-
-sockopt example::
-
-    from websocket import create_connection
-    ws = create_connection("ws://echo.websocket.org/",
-                            sockopt=((socket.IPPROTO_TCP, socket.TCP_NODELAY),))
-
-
-JavaScript websocket-like API example::
+.. code:: python
 
     import websocket
     import thread
@@ -112,6 +97,50 @@ JavaScript websocket-like API example::
         ws.run_forever()
 
 
+Short-lived one-off send-receive
+--------------------------------
+This is if you want to communicate a short message and disconnect immediately when done.
+
+.. code:: python
+
+    from websocket import create_connection
+    ws = create_connection("ws://echo.websocket.org/")
+    print "Sending 'Hello, World'..."
+    ws.send("Hello, World")
+    print "Sent"
+    print "Receiving..."
+    result =  ws.recv()
+    print "Received '%s'" % result
+    ws.close()
+
+If you want to customize socket options, set sockopt.
+
+sockopt example
+
+.. code:: python
+
+    from websocket import create_connection
+    ws = create_connection("ws://echo.websocket.org/",
+                            sockopt=((socket.IPPROTO_TCP, socket.TCP_NODELAY),))
+
+
+More advanced: Custom class
+---------------------------
+You can also write your own class for the connection, if you want to handle the nitty-gritty details yourself.
+
+.. code:: python
+
+    from websocket import create_connection, WebSocket
+    class MyWebSocket(WebSocket):
+        def recv_frame(self):
+            frame = super().recv_frame()
+            print('yay! I got this frame: ', frame)
+            return frame
+
+    ws = create_connection("ws://echo.websocket.org/",
+                            sockopt=((socket.IPPROTO_TCP, socket.TCP_NODELAY),), class_=MyWebSocket)
+
+
 FAQ
 ============
 
@@ -120,17 +149,23 @@ How to disable ssl cert verification?
 
 Please set sslopt to {"cert_reqs": ssl.CERT_NONE}.
 
-WebSocketApp sample::
+WebSocketApp sample
+
+.. code:: python
 
     ws = websocket.WebSocketApp("wss://echo.websocket.org")
     ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
-create_connection sample::
+create_connection sample
+
+.. code:: python
 
     ws = websocket.create_connection("wss://echo.websocket.org",
       sslopt={"cert_reqs": ssl.CERT_NONE})
 
-WebSocket sample::
+WebSocket sample
+
+.. code:: python
 
     ws = websocket.WebSocket(sslopt={"cert_reqs": ssl.CERT_NONE})
     ws.connect("wss://echo.websocket.org")
@@ -142,17 +177,23 @@ How to disable hostname verification.
 Please set sslopt to {"check_hostname": False}.
 (since v0.18.0)
 
-WebSocketApp sample::
+WebSocketApp sample
+
+.. code:: python
 
     ws = websocket.WebSocketApp("wss://echo.websocket.org")
     ws.run_forever(sslopt={"check_hostname": False})
 
-create_connection sample::
+create_connection sample
+
+.. code:: python
 
     ws = websocket.create_connection("wss://echo.websocket.org",
       sslopt={"check_hostname": False})
 
-WebSocket sample::
+WebSocket sample
+
+.. code:: python
 
     ws = websocket.WebSocket(sslopt={"check_hostname": False})
     ws.connect("wss://echo.websocket.org")
@@ -170,7 +211,9 @@ Sub Protocols.
 The server needs to support sub protocols, please set the subprotocol like this.
 
 
-Subprotocol sample::
+Subprotocol sample
+
+.. code:: python
 
     ws = websocket.create_connection("ws://exapmle.com/websocket", subprotocols=["binary", "base64"])
 
@@ -194,6 +237,7 @@ Usage
 ---------
 
 usage::
+
   wsdump.py [-h] [-v [VERBOSE]] ws_url
 
 WebSocket Simple Dump Tool
